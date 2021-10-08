@@ -126,6 +126,7 @@ class VOCSegmentation(PascalVOC):
 
         self.images = []
         self.masks = []
+        self.sizes = []
         with open(_split_f, "r") as lines:
             for line in lines:
                 _image, _mask = line.strip("\n").split(' ')
@@ -137,6 +138,12 @@ class VOCSegmentation(PascalVOC):
                     _mask = os.path.join(self.root, _mask.lstrip('/'))
                     assert os.path.isfile(_mask), '%s not found' % _mask
                     self.masks.append(_mask)
+
+                    _size = _mask.split('/')[4].split('.')[0]
+                    _size = os.path.join(self.root, _size + '.pkl')
+                    assert os.path.isfile(_size), '%s not found' % _size
+                    self.sizes.append(_size)
+
 
         if self.split != 'test':
             assert (len(self.images) == len(self.masks))
@@ -158,6 +165,7 @@ class VOCSegmentation(PascalVOC):
 
         image = Image.open(self.images[index]).convert('RGB')
         mask  = Image.open(self.masks[index])
+        size = pickle.load(self.sizes[index])
 
         unique_labels = np.unique(mask)
 
@@ -176,8 +184,10 @@ class VOCSegmentation(PascalVOC):
 
         # general resize, normalize and toTensor
         image, mask = self.transform(image, mask)
+        size = np.array(list(size.values()), dtype = np.float64)
+        size = torch.from_numpy(size)
 
-        return image, labels, os.path.basename(self.images[index])
+        return image, labels, size, os.path.basename(self.images[index])
 
     @property
     def pred_offset(self):

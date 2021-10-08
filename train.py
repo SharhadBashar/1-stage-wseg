@@ -18,7 +18,7 @@ from functools import partial
 from opts import get_arguments
 from core.config import cfg, cfg_from_file, cfg_from_list
 from datasets.utils import Colorize
-from losses import get_criterion, mask_loss_ce
+from losses import get_criterion, mask_loss_ce, size_loss
 
 from utils.timer import Timer
 from utils.stat_manager import StatManager
@@ -78,7 +78,7 @@ class DecTrainer(BaseTrainer):
         self.enc = nn.DataParallel(self.enc).cuda()
         self.criterion_cls = nn.DataParallel(self.criterion_cls).cuda()
 
-    def step(self, epoch, image, gt_labels, train=False, visualise=False):
+    def step(self, epoch, image, size, gt_labels, train=False, visualise=False):
 
         PRETRAIN = epoch < (11 if DEBUG else cfg.TRAIN.PRETRAIN)
 
@@ -90,12 +90,14 @@ class DecTrainer(BaseTrainer):
 
         # classification loss
         loss_cls = self.criterion_cls(cls_out, gt_labels).mean()
+        loss_size = size_loss(size, pseudo_gt, loss_type = 1)
 
         # keep track of all losses for logging
         losses = {"loss_cls": loss_cls.item(),
-                  "loss_fg": cls_fg.mean().item()}
+                  "loss_fg": cls_fg.mean().item(),
+                  'loss_size': loss_size.item()}
 
-        loss = loss_cls.clone()
+        loss = loss_cls.clone() + loss_size.clone()
         if "dec" in masks:
             loss_mask = loss_mask.mean()
 
@@ -132,15 +134,16 @@ class DecTrainer(BaseTrainer):
         stat.add_val("loss_cls")
         stat.add_val("loss_fg")
         stat.add_val("loss_bce")
+        stat.add_val('loss_size')
 
         # adding stats for classes
         timer = Timer("New Epoch: ")
         train_step = partial(self.step, train=True, visualise=False)
 
-        for i, (image, gt_labels, _) in enumerate(self.trainloader):
+        for i, (image, gt_labels, size, _) in enumerate(self.trainloader):
 
             # masks
-            losses, _, _, _ = train_step(epoch, image, gt_labels)
+            losses, _, _, _ = train_step(epoch, image, size, gt_labels)
 
             if self.fixed_batch is None:
                 self.fixed_batch = {}
