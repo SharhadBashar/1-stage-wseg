@@ -31,9 +31,9 @@ torch.backends.cudnn.benchmark = True
 #torch.backends.cudnn.deterministic = True
 DEBUG = False
 
-def rescale_as(x, y, mode="bilinear", align_corners=True):
+def rescale_as(x, y, mode = 'bilinear', align_corners = True):
     h, w = y.size()[2:]
-    x = F.interpolate(x, size=[h, w], mode=mode, align_corners=align_corners)
+    x = F.interpolate(x, size=[h, w], mode = mode, align_corners = align_corners)
     return x
 
 class DecTrainer(BaseTrainer):
@@ -56,7 +56,7 @@ class DecTrainer(BaseTrainer):
             self.classIndex[cname] = i
 
         # model
-        self.enc = get_model(cfg.NET, num_classes=self.nclass)
+        self.enc = get_model(cfg.NET, num_classes = self.nclass)
         self.criterion_cls = get_criterion(cfg.NET.LOSS)
         # print(self.enc)
 
@@ -71,82 +71,50 @@ class DecTrainer(BaseTrainer):
         self.fixed_batch = None
         self.fixed_batch_path = args.fixed_batch_path
         if os.path.isfile(self.fixed_batch_path):
-            print("Loading fixed batch from {}".format(self.fixed_batch_path))
+            print('Loading fixed batch from {}'.format(self.fixed_batch_path))
             self.fixed_batch = torch.load(self.fixed_batch_path)
 
         # using cuda
         self.enc = nn.DataParallel(self.enc).cuda()
         self.criterion_cls = nn.DataParallel(self.criterion_cls).cuda()
 
-    def step(self, epoch, image, size, gt_labels, train=False, visualise=False):
+    def step(self, epoch, image, size, gt_labels, train = False, visualise = False):
 
         PRETRAIN = epoch < (11 if DEBUG else cfg.TRAIN.PRETRAIN)
 
         # denorm image
         image_raw = self.denorm(image.clone())
         
-        # if train:
-        #     print('image')
-        #     print(image.shape)
-        #     print(image)
-        #     print()
 
         # classification
         cls_out, cls_fg, masks, mask_logits, pseudo_gt, loss_mask = self.enc(image, image_raw, gt_labels)
 
-        # if train:
-        #     print('cls_out')
-        #     print(cls_out.shape)
-        #     print(cls_out)
-        #     print()
 
-        #     print('cls_fg')
-        #     print(cls_fg.shape)
-        #     print(cls_fg)
-        #     print()
+        # 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
 
-        #     print('masks')
-        #     print(masks['cam'].shape)
-        #     print(masks)
-        #     print()
 
-        #     print('mask_logits')
-        #     print(mask_logits.shape)
-        #     print(mask_logits)
-        #     print()
-
-        #     print('pseudo_gt')
-        #     print(pseudo_gt.shape)
-        #     print(pseudo_gt)
-        #     print()
-
-        #     print('loss_mask')
-        #     print(loss_mask.shape)
-        #     print(loss_mask)
-
-        #     input()
 
         # classification loss
         loss_cls = self.criterion_cls(cls_out, gt_labels).mean()
         loss_size = size_loss(size, pseudo_gt, loss_type = 1)
 
         # keep track of all losses for logging
-        losses = {"loss_cls": loss_cls.item(),
-                  "loss_fg": cls_fg.mean().item(),
+        losses = {'loss_cls': loss_cls.item(),
+                  'loss_fg': cls_fg.mean().item(),
                   'loss_size': loss_size.item()}
 
         loss = loss_cls.clone() + loss_size.clone()
-        if "dec" in masks:
+        if 'dec' in masks:
             loss_mask = loss_mask.mean()
 
             if not PRETRAIN:
                 loss += cfg.NET.MASK_LOSS_BCE * loss_mask
 
-            assert not "pseudo" in masks
-            masks["pseudo"] = pseudo_gt
-            losses["loss_mask"] = loss_mask.item()
+            assert not 'pseudo' in masks
+            masks['pseudo'] = pseudo_gt
+            losses['loss_mask'] = loss_mask.item()
 
-        losses["loss"] = loss.item()
+        losses['loss'] = loss.item()
 
         if train:
             self.optim_enc.zero_grad()
@@ -168,14 +136,14 @@ class DecTrainer(BaseTrainer):
         self.enc.train()
 
         stat = StatManager()
-        stat.add_val("loss")
-        stat.add_val("loss_cls")
-        stat.add_val("loss_fg")
-        stat.add_val("loss_bce")
+        stat.add_val('loss')
+        stat.add_val('loss_cls')
+        stat.add_val('loss_fg')
+        stat.add_val('loss_bce')
         stat.add_val('loss_size')
 
         # adding stats for classes
-        timer = Timer("New Epoch: ")
+        timer = Timer('New Epoch: ')
         train_step = partial(self.step, train=True, visualise=False)
 
         for i, (image, gt_labels, size, _) in enumerate(self.trainloader):
@@ -185,8 +153,9 @@ class DecTrainer(BaseTrainer):
 
             if self.fixed_batch is None:
                 self.fixed_batch = {}
-                self.fixed_batch["image"]   = image.clone()
-                self.fixed_batch["labels"]  = gt_labels.clone()
+                self.fixed_batch['image'] = image.clone()
+                self.fixed_batch['size'] = size.clone()
+                self.fixed_batch['labels'] = gt_labels.clone()
                 torch.save(self.fixed_batch, self.fixed_batch_path)
 
             for loss_key, loss_val in losses.items():
@@ -194,11 +163,11 @@ class DecTrainer(BaseTrainer):
 
             # intermediate logging
             if i % 10 == 0:
-                msg =  "Loss [{:04d}]: ".format(i)
+                msg =  'Loss [{:04d}]: '.format(i)
                 for loss_key, loss_val in losses.items():
-                    msg += "{}: {:.4f} | ".format(loss_key, loss_val)
+                    msg += '{}: {:.4f} | '.format(loss_key, loss_val)
                 
-                msg += " | Im/Sec: {:.1f}".format(i * cfg.TRAIN.BATCH_SIZE / timer.get_stage_elapsed())
+                msg += ' | Im/Sec: {:.1f}'.format(i * cfg.TRAIN.BATCH_SIZE / timer.get_stage_elapsed())
                 print(msg)
                 sys.stdout.flush()
 
@@ -207,8 +176,8 @@ class DecTrainer(BaseTrainer):
             if DEBUG and i > 100:
                 break
 
-        def publish_loss(stats, name, t, prefix='data/'):
-            print("{}: {:4.3f}".format(name, stats.summarize_key(name)))
+        def publish_loss(stats, name, t, prefix = 'data/'):
+            print('{}: {:4.3f}'.format(name, stats.summarize_key(name)))
             #self.writer.add_scalar(prefix + name, stats.summarize_key(name), t)
 
         for stat_key in stat.vals.keys():
@@ -216,7 +185,7 @@ class DecTrainer(BaseTrainer):
 
         # plotting learning rate
         for ii, l in enumerate(self.optim_enc.param_groups):
-            print("Learning rate [{}]: {:4.3e}".format(ii, l['lr']))
+            print('Learning rate [{}]: {:4.3e}'.format(ii, l['lr']))
             self.writer.add_scalar('lr/enc_group_%02d' % ii, l['lr'], epoch)
 
         #self.writer.add_scalar('lr/bg_baseline', self.enc.module.mean.item(), epoch)
@@ -224,9 +193,7 @@ class DecTrainer(BaseTrainer):
         # visualising
         self.enc.eval()
         with torch.no_grad():
-            self.step(epoch, self.fixed_batch["image"], \
-                             self.fixed_batch["labels"], \
-                             train=False, visualise=True)
+            self.step(epoch, self.fixed_batch['image'], self.fixed_batch['size'], self.fixed_batch['labels'], train = False, visualise = True)
 
     def _mask_rgb(self, masks, image_norm):
         # visualising masks
@@ -254,15 +221,14 @@ class DecTrainer(BaseTrainer):
 
         return torch.cat(masks, 0)
 
-    def validation(self, epoch, writer, loader, checkpoint=False):
+    def validation(self, epoch, writer, loader, checkpoint = False):
 
         stat = StatManager()
 
         # Fast test during the training
         def eval_batch(image, gt_labels):
 
-            losses, cls, masks, mask_logits = \
-                    self.step(epoch, image, size, gt_labels, train=False, visualise=False)
+            losses, cls, masks, mask_logits = self.step(epoch, image, size, gt_labels, train = False, visualise = False)
 
             for loss_key, loss_val in losses.items():
                 stat.update_stats(loss_key, loss_val)
@@ -296,7 +262,7 @@ class DecTrainer(BaseTrainer):
         #
         targets_stacked = np.vstack(targets_all)
         preds_stacked = np.vstack(preds_all)
-        aps = average_precision_score(targets_stacked, preds_stacked, average=None)
+        aps = average_precision_score(targets_stacked, preds_stacked, average = None)
 
         # skip BG AP
         offset = self.nclass - aps.size
@@ -305,7 +271,7 @@ class DecTrainer(BaseTrainer):
         classNames = self.classNames[offset:]
         for ni, className in enumerate(classNames):
             writer.add_scalar('%02d_%s/AP' % (ni + offset, className), aps[ni], epoch)
-            print("AP_{}: {:4.3f}".format(className, aps[ni]))
+            print('AP_{}: {:4.3f}'.format(className, aps[ni]))
 
         meanAP = np.mean(aps)
         writer.add_scalar('all_wo_BG/mAP', meanAP, epoch)
@@ -318,7 +284,7 @@ class DecTrainer(BaseTrainer):
         if checkpoint and epoch >= cfg.TRAIN.PRETRAIN: 
             # we will use mAP - mask_loss as our proxy score
             # to save the best checkpoint so far
-            proxy_score = 1 - stat.summarize_key("loss")
+            proxy_score = 1 - stat.summarize_key('loss')
             writer.add_scalar('all/checkpoint_score', proxy_score, epoch)
             self.checkpoint_best(proxy_score, epoch)
 
@@ -326,25 +292,25 @@ class DecTrainer(BaseTrainer):
         image_norm = self.denorm(image.clone()).cpu()
         visual = [image_norm]
 
-        if "cam" in masks:
-            visual.append(self._mask_rgb(masks["cam"], image_norm))
+        if 'cam' in masks:
+            visual.append(self._mask_rgb(masks['cam'], image_norm))
 
-        if "dec" in masks:
-            visual.append(self._mask_rgb(masks["dec"], image_norm))
+        if 'dec' in masks:
+            visual.append(self._mask_rgb(masks['dec'], image_norm))
 
-        if "pseudo" in masks:
-            pseudo_gt_rgb = self._mask_rgb(masks["pseudo"], image_norm)
+        if 'pseudo' in masks:
+            pseudo_gt_rgb = self._mask_rgb(masks['pseudo'], image_norm)
 
             # cancel ambiguous
-            ambiguous = 1 - masks["pseudo"].sum(1, keepdim=True).cpu()
+            ambiguous = 1 - masks['pseudo'].sum(1, keepdim = True).cpu()
             pseudo_gt_rgb = ambiguous * image_norm + (1 - ambiguous) * pseudo_gt_rgb
             visual.append(pseudo_gt_rgb)
 
         # ready to assemble
         visual_logits = torch.cat(visual, -1)
-        self._visualise_grid(visual_logits, gt_labels, epoch, scores=cls_out)
+        self._visualise_grid(visual_logits, gt_labels, epoch, scores = cls_out)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     args = get_arguments(sys.argv[1:])
 
     # Reading the config
@@ -352,7 +318,7 @@ if __name__ == "__main__":
     if args.set_cfgs is not None:
         cfg_from_list(args.set_cfgs)
 
-    print("Config: \n", cfg)
+    print('Config: \n', cfg)
 
     trainer = DecTrainer(args)
     torch.manual_seed(0)
@@ -361,18 +327,18 @@ if __name__ == "__main__":
     def time_call(func, msg, *args, **kwargs):
         timer.reset_stage()
         func(*args, **kwargs)
-        print(msg + (" {:3.2}m".format(timer.get_stage_elapsed() / 60.)))
+        print(msg + (' {:3.2}m'.format(timer.get_stage_elapsed() / 60.)))
 
     for epoch in range(trainer.start_epoch, cfg.TRAIN.NUM_EPOCHS + 1):
-        print("Epoch >>> ", epoch)
+        print('Epoch >>> ', epoch)
         
         log_int = 5 if DEBUG else 2
         if epoch % log_int == 0:
             with torch.no_grad():
                 if not DEBUG:
-                    time_call(trainer.validation, "Validation / Train: ", epoch, trainer.writer, trainer.trainloader_val)
-                time_call(trainer.validation, "Validation /   Val: ", epoch, trainer.writer_val, trainer.valloader, checkpoint=True)
+                    time_call(trainer.validation, 'Validation / Train: ', epoch, trainer.writer, trainer.trainloader_val)
+                time_call(trainer.validation, 'Validation /   Val: ', epoch, trainer.writer_val, trainer.valloader, checkpoint=True)
 
-        time_call(trainer.train_epoch, "Train epoch: ", epoch)
+        time_call(trainer.train_epoch, 'Train epoch: ', epoch)
     print('Done training')
     sys.exit(0)
