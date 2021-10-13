@@ -1,6 +1,6 @@
 # Single-Stage Semantic Segmentation from Image Labels
 
-forked from https://github.com/visinf/1-stage-wseg
+Forked from https://github.com/visinf/1-stage-wseg
 
 ### Setup
 0. **Minimum requirements.** This project was originally developed with Python 3.6, PyTorch 1.0 and CUDA 9.0. The training requires at least two Titan X GPUs (12Gb memory each).
