@@ -1,19 +1,6 @@
 # Single-Stage Semantic Segmentation from Image Labels
 
-This repository contains the original implementation of our paper:
-
-
-**Single-stage Semantic Segmentation from Image Labels**<br>
-*[Nikita Araslanov](https://arnike.github.io) and [Stefan Roth](https://www.visinf.tu-darmstadt.de/team_members/sroth/sroth.en.jsp)*<br>
-To appear at CVPR 2020.
-[[arXiv preprint]](https://arxiv.org/abs/2005.08104)
-
-Contact: Nikita Araslanov <fname.lname@visinf.tu-darmstadt.de>
-
-
-| <img src="figures/results.gif" alt="drawing" width="480"/><br> |
-|:---|
-| We attain competitive results by training a single network model <br> for segmentation in a self-supervised fashion using only <br> image-level annotations (one run of 20 epochs on Pascal VOC). |
+Forked from https://github.com/visinf/1-stage-wseg
 
 ### Setup
 0. **Minimum requirements.** This project was originally developed with Python 3.6, PyTorch 1.0 and CUDA 9.0. The training requires at least two Titan X GPUs (12Gb memory each).
@@ -79,11 +66,6 @@ The also release the masks predicted by this model:
 The suffix `-clean` means we used ground-truth image-level labels to remove masks of the categories not present in the image.
 These masks are commonly used as pseudo ground truth to train another segmentation model in fully supervised regime.
 
-## Acknowledgements
-We thank PyTorch team, and Jiwoon Ahn for releasing his [code](https://github.com/jiwoon-ahn/psa) that helped in the early stages of this project.
-
-## Citation
-We hope that you find this work useful. If you would like to acknowledge us, please, use the following citation:
 ```
 @inproceedings{Araslanov:2020:WSEG,
   title     = {Single-Stage Semantic Segmentation from Image Labels},
