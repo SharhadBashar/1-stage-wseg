@@ -32,6 +32,7 @@ __C.TRAIN = AttrDict()
 __C.TRAIN.BATCH_SIZE = 20
 __C.TRAIN.NUM_EPOCHS = 15
 __C.TRAIN.NUM_WORKERS = 4
+# __C.TRAIN.NUM_WORKERS = 4
 __C.TRAIN.MASK_LOSS = 0.0
 __C.TRAIN.PRETRAIN = 5
 
@@ -40,7 +41,7 @@ __C.TRAIN.PRETRAIN = 5
 # ---------------------------------------------------------------------------- #
 __C.TEST = AttrDict()
 __C.TEST.METHOD = "multiscale" # multiscale | crop
-__C.TEST.DATA_ROOT = "/data/your_directory"
+__C.TEST.DATA_ROOT = "/data"
 __C.TEST.SCALES = [1, 0.5, 1.5, 2.0]
 __C.TEST.FLIP = True
 __C.TEST.PAD_SIZE = [1024, 1024]

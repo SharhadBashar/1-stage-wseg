@@ -93,18 +93,17 @@ def __half():
 def size_loss(size, pseudo_gt, loss_type = 1):
     weight = [1e-3, 1e-2, 1e-1, 1, 10, 20, 30, 40, 50, 100, 200, 500]
 
-    pseudo_gt_softmax = F.softmax(pseudo_gt)
+    pseudo_gt_softmax = F.softmax(pseudo_gt, dim = 0)
     pseudo_gt_size = pseudo_gt_softmax.mean(3).mean(2)
-
-    N_c, C = pred_cls.shape
+    N_c, C = pseudo_gt_size.shape
     sum_N_c = 0
 
     for n in range(N_c):
         if (loss_type == 1):
-            sum_C = torch.sum((pred_cls_size[n] - size[n].cuda()) ** 2)
+            sum_C = torch.sum((pseudo_gt_size[n] - size[n].cuda()) ** 2)
         elif (loss_type == 2):
-            pentaly_n = __get_penalty(pred_cls_size[n], size[n])
-            sum_C = torch.sum((pred_cls_size[n] - pentaly_n.cuda()) ** 2)
+            pentaly_n = __get_penalty(pseudo_gt_size[n], size[n])
+            sum_C = torch.sum((pseudo_gt_size[n] - pentaly_n.cuda()) ** 2)
         elif (loss_type == 3):
             sum_C = 0
         else:
@@ -112,6 +111,7 @@ def size_loss(size, pseudo_gt, loss_type = 1):
         sum_N_c += sum_C / (C - 1)
 
     loss_size = weight[5] * sum_N_c / N_c
+    return loss_size
 
 
 

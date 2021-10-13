@@ -5,6 +5,7 @@ from torch.utils.data import Dataset
 from PIL import Image, ImagePalette
 from .utils import colormap
 import datasets.transforms as tf
+import pickle
 
 class PascalVOC(Dataset):
 
@@ -107,6 +108,7 @@ class VOCSegmentation(PascalVOC):
 
         self.cfg = cfg
         self.root = root
+        self.size_dir = 'voc/VOCdevkit/VOC2012/SegmentationClassAugSizeActual/'
         self.split = split
         self.test_mode = test_mode
 
@@ -139,8 +141,8 @@ class VOCSegmentation(PascalVOC):
                     assert os.path.isfile(_mask), '%s not found' % _mask
                     self.masks.append(_mask)
 
-                    _size = _mask.split('/')[4].split('.')[0]
-                    _size = os.path.join(self.root, _size + '.pkl')
+                    _size = _mask.split('/')[6].split('.')[0]
+                    _size = os.path.join(self.root, self.size_dir, _size + '.pkl')
                     assert os.path.isfile(_size), '%s not found' % _size
                     self.sizes.append(_size)
 
@@ -165,7 +167,8 @@ class VOCSegmentation(PascalVOC):
 
         image = Image.open(self.images[index]).convert('RGB')
         mask  = Image.open(self.masks[index])
-        size = pickle.load(self.sizes[index])
+        with open(self.sizes[index], 'rb') as f:
+            size = pickle.load(f)
 
         unique_labels = np.unique(mask)
 

@@ -6,3 +6,4 @@ data/voc
 snapshots/
 output/
 scores.log
+models/weights

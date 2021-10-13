@@ -58,7 +58,7 @@ class DecTrainer(BaseTrainer):
         # model
         self.enc = get_model(cfg.NET, num_classes=self.nclass)
         self.criterion_cls = get_criterion(cfg.NET.LOSS)
-        print(self.enc)
+        # print(self.enc)
 
         # optimizer using different LR
         enc_params = self.enc.parameter_groups(cfg.NET.LR, cfg.NET.WEIGHT_DECAY)
@@ -262,7 +262,7 @@ class DecTrainer(BaseTrainer):
         def eval_batch(image, gt_labels):
 
             losses, cls, masks, mask_logits = \
-                    self.step(epoch, image, gt_labels, train=False, visualise=False)
+                    self.step(epoch, image, size, gt_labels, train=False, visualise=False)
 
             for loss_key, loss_val in losses.items():
                 stat.update_stats(loss_key, loss_val)
@@ -281,7 +281,7 @@ class DecTrainer(BaseTrainer):
             means.append(x.mean())
             stds.append(x.std())
 
-        for n, (image, gt_labels, _) in enumerate(loader):
+        for n, (image, gt_labels, size, _) in enumerate(loader):
 
             with torch.no_grad():
                 cls_raw, masks_all, mask_logits = eval_batch(image, gt_labels)
