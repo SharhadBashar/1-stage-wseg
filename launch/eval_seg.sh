@@ -5,9 +5,9 @@ FILELIST=data/val_voc.txt # validation
 
 ## You values here:
 #
-OUTPUT_DIR=
-EXP=
-RUN_ID=
+OUTPUT_DIR=output
+EXP=baselines
+RUN_ID=v01_size
 #
 ##
 

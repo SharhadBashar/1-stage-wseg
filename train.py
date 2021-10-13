@@ -84,9 +84,47 @@ class DecTrainer(BaseTrainer):
 
         # denorm image
         image_raw = self.denorm(image.clone())
+        
+        # if train:
+        #     print('image')
+        #     print(image.shape)
+        #     print(image)
+        #     print()
 
         # classification
         cls_out, cls_fg, masks, mask_logits, pseudo_gt, loss_mask = self.enc(image, image_raw, gt_labels)
+
+        # if train:
+        #     print('cls_out')
+        #     print(cls_out.shape)
+        #     print(cls_out)
+        #     print()
+
+        #     print('cls_fg')
+        #     print(cls_fg.shape)
+        #     print(cls_fg)
+        #     print()
+
+        #     print('masks')
+        #     print(masks['cam'].shape)
+        #     print(masks)
+        #     print()
+
+        #     print('mask_logits')
+        #     print(mask_logits.shape)
+        #     print(mask_logits)
+        #     print()
+
+        #     print('pseudo_gt')
+        #     print(pseudo_gt.shape)
+        #     print(pseudo_gt)
+        #     print()
+
+        #     print('loss_mask')
+        #     print(loss_mask.shape)
+        #     print(loss_mask)
+
+        #     input()
 
         # classification loss
         loss_cls = self.criterion_cls(cls_out, gt_labels).mean()
@@ -336,3 +374,5 @@ if __name__ == "__main__":
                 time_call(trainer.validation, "Validation /   Val: ", epoch, trainer.writer_val, trainer.valloader, checkpoint=True)
 
         time_call(trainer.train_epoch, "Train epoch: ", epoch)
+    print('Done training')
+    sys.exit(0)

@@ -3,21 +3,21 @@
 ## Your values here:
 #
 DS=pascal_voc
-EXP=
-RUN_ID=
+EXP=baselines
+RUN_ID=v01_size
 #
 ##
 
 #
 # Script
 #
-
+now=$(date)
 LOG_DIR=logs/${DS}/${EXP}
 CMD="python train.py --dataset $DS --cfg configs/voc_resnet38.yaml --exp $EXP --run $RUN_ID"
 LOG_FILE=$LOG_DIR/${RUN_ID}.log
 
 if [ ! -d "$LOG_DIR" ]; then
-  echo "Creating directory $LOG_DIR"
+  echo "Creating directory $LOG_DIR $now" 
   mkdir -p $LOG_DIR
 fi
 
@@ -27,3 +27,4 @@ echo "LOG: $LOG_FILE"
 nohup $CMD > $LOG_FILE 2>&1 &
 sleep 1
 tail -f $LOG_FILE
+echo "Done"

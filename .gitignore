@@ -1,4 +1,8 @@
 *.swp
 *.pyc
 logs/
-data/
+data/sbd
+data/voc
+snapshots/
+output/
+scores.log

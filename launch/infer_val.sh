@@ -9,12 +9,12 @@ FILELIST=data/val_voc.txt
 
 ## You values here (see below how they're used)
 #
-OUTPUT_DIR=
-EXP=
-RUN_ID=
-SNAPSHOT=
+OUTPUT_DIR=output
+EXP=baselines
+RUN_ID=v01_size
+SNAPSHOT=e012Xs0.907
 EXTRA_ARGS=
-SAVE_ID=
+SAVE_ID=v01_size
 #
 ##
 
@@ -48,8 +48,8 @@ else
   echo "Saving to: $SAVE_DIR"
 fi
 
-git rev-parse HEAD > ${SAVE_DIR}.head
-git diff > ${SAVE_DIR}.diff
+# git rev-parse HEAD > ${SAVE_DIR}.head
+# git diff > ${SAVE_DIR}.diff
 echo $CMD > ${SAVE_DIR}.cmd
 
 echo $CMD
