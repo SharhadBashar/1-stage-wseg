@@ -76,8 +76,7 @@ if __name__ == '__main__':
 
     dataset = DatasetClass(args.infer_list, cfg.TEST, transform=transform)
 
-    dataloader = DataLoader(dataset, shuffle=False, num_workers=args.workers, \
-                            pin_memory=True, batch_size=cfg.TEST.BATCH_SIZE)
+    dataloader = DataLoader(dataset, shuffle=False, num_workers=args.workers, pin_memory=True, batch_size=cfg.TEST.BATCH_SIZE)
 
     model = nn.DataParallel(model).cuda()
 
@@ -121,6 +120,4 @@ if __name__ == '__main__':
 
     pool.close()
     pool.join()
-
-    print('Done infer val')
-    sys.exit(0)
+    print('Done infer_val')

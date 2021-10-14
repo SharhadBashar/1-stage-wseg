@@ -22,7 +22,7 @@ NET:
   SG_PSI: 0.3
 TEST:
   METHOD: "multiscale"
-  DATA_ROOT: "/fastdata/naraslanov"
+  DATA_ROOT: "data"
   FLIP: True
   BATCH_SIZE: 8 # 4 scales, +1 flip for each
   PAD_SIZE: [1024, 1024]

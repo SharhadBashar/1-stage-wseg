@@ -2,6 +2,7 @@ import os
 import torch
 import numpy as np
 import scipy.misc
+import imageio
 
 import torch.nn.functional as F
 
@@ -58,10 +59,12 @@ class ResultWriter:
         pred_crf = np.argmax(pred_crf, 0)
 
         filepath = os.path.join(self.root, img_name + '.png')
-        scipy.misc.imsave(filepath, pred.astype(np.uint8))
+        # scipy.misc.imsave(filepath, pred.astype(np.uint8))
+        imageio.imsave(filepath, pred.astype(np.uint8))
 
         filepath = os.path.join(self.root, "crf", img_name + '.png')
-        scipy.misc.imsave(filepath, pred_crf.astype(np.uint8))
+        # scipy.misc.imsave(filepath, pred_crf.astype(np.uint8))
+        imageio.imsave(filepath, pred_crf.astype(np.uint8))
 
         if self.verbose:
             mask_gt = gt_mask.numpy()
@@ -72,7 +75,8 @@ class ResultWriter:
             overlay = self._mask_overlay(masks_all, images)
             filepath = os.path.join(self.root, "vis", img_name + '.png')
             overlay255 = np.round(overlay * 255.).astype(np.uint8)
-            scipy.misc.imsave(filepath, overlay255)
+            # scipy.misc.imsave(filepath, overlay255)
+            imageio.imsave(filepath, overlay255)
 
 class MergeMultiScale(ResultWriter):
 
@@ -181,7 +185,8 @@ class PAMRWriter(ResultWriter):
 
             filepath = os.path.join(self.root, img_name + '_gt.png')
             overlay255 = np.round(overlay_gt * 255.).astype(np.uint8)
-            scipy.misc.imsave(filepath, overlay255)
+            # scipy.misc.imsave(filepath, overlay255)
+            imageio.imsave(filepath, overlay255)
 
             for it, mask_batch in enumerate(all_masks):
 
@@ -196,8 +201,8 @@ class PAMRWriter(ResultWriter):
 
                 filepath = os.path.join(self.root, img_name + '_{:02d}.png'.format(it))
                 overlay255 = np.round(overlay * 255.).astype(np.uint8)
-                scipy.misc.imsave(filepath, overlay255)
-
+                # scipy.misc.imsave(filepath, overlay255)
+                imageio.imsave(filepath, overlay255)
 
 def get_inference_io(method_name):
 

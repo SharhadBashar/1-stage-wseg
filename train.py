@@ -89,11 +89,6 @@ class DecTrainer(BaseTrainer):
         # classification
         cls_out, cls_fg, masks, mask_logits, pseudo_gt, loss_mask = self.enc(image, image_raw, gt_labels)
 
-
-        # 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
-
-
-
         # classification loss
         loss_cls = self.criterion_cls(cls_out, gt_labels).mean()
         loss_size = size_loss(size, pseudo_gt, loss_type = 1)

@@ -278,6 +278,4 @@ if __name__ == "__main__":
     check_args(args)
     stats = evaluate_all(args)
     summarise_stats(stats)
-
     print('Done eval_seg')
-    sys.exit(0)

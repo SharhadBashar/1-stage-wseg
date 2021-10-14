@@ -91,7 +91,7 @@ def __half():
         file.close()
 
 def size_loss(size, pseudo_gt, loss_type = 1):
-    weight = [1e-3, 1e-2, 1e-1, 1, 10, 20, 30, 40, 50, 100, 200, 500]
+    weight = [1e-3, 1e-2, 1e-1, 1, 2, 10, 20, 30, 40, 50, 100, 200, 500]
 
     pseudo_gt_softmax = F.softmax(pseudo_gt, dim = 0)
     pseudo_gt_size = pseudo_gt_softmax.mean(3).mean(2)
@@ -110,7 +110,7 @@ def size_loss(size, pseudo_gt, loss_type = 1):
             sum_C = 0
         sum_N_c += sum_C / (C - 1)
 
-    loss_size = weight[5] * sum_N_c / N_c
+    loss_size = weight[3] * sum_N_c / N_c
     return loss_size
 
 

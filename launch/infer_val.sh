@@ -11,10 +11,10 @@ FILELIST=data/val_voc.txt
 #
 OUTPUT_DIR=output
 EXP=baselines
-RUN_ID=v01_size
-SNAPSHOT=e012Xs0.907
+RUN_ID=v01_size_2
+SNAPSHOT=e018Xs0.850
 EXTRA_ARGS=
-SAVE_ID=v01_size
+SAVE_ID=v01_size_2
 #
 ##
 
