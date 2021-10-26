@@ -4,7 +4,7 @@
 #
 DS=pascal_voc
 EXP=baselines
-RUN_ID=v01_size_1
+RUN_ID=test
 #
 ##
 

@@ -90,8 +90,8 @@ def __half():
         pickle.dump(count_old, file)
         file.close()
 
-def size_loss(size, pseudo_gt, loss_type = 1):
-    weight = [1e-3, 1e-2, 1e-1, 1, 2, 10, 20, 30, 40, 50, 100, 200, 500]
+def size_loss(size, pseudo_gt, loss_cls, loss_type = 1):
+    weights = [1e-3, 1e-2, 1e-1, -1, 1, 10, 20, 30, 40, 50, 100, 200, 500]
 
     pseudo_gt_softmax = F.softmax(pseudo_gt, dim = 0)
     pseudo_gt_size = pseudo_gt_softmax.mean(3).mean(2)
@@ -110,7 +110,17 @@ def size_loss(size, pseudo_gt, loss_type = 1):
             sum_C = 0
         sum_N_c += sum_C / (C - 1)
 
-    loss_size = weight[3] * sum_N_c / N_c
+    if (loss_cls >= 1e-1):
+        weight = weights[5]
+    elif (loss_cls >= 1e-2 and loss_cls < 1e-1):
+        weight = weights[4]
+    elif (loss_cls >= 1e-3 and loss_cls < 1e-2):
+        weight = weights[2]
+    elif(loss_cls >= 1e-4 and loss_cls < 1e-3):
+        weight = weights[1]
+    else:
+        weight = weights[1]
+    loss_size = weight * sum_N_c / N_c
     return loss_size
 
 

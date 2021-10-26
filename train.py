@@ -91,7 +91,7 @@ class DecTrainer(BaseTrainer):
 
         # classification loss
         loss_cls = self.criterion_cls(cls_out, gt_labels).mean()
-        loss_size = size_loss(size, pseudo_gt, loss_type = 1)
+        loss_size = size_loss(size, pseudo_gt, loss_cls.item(), loss_type = 1)
 
         # keep track of all losses for logging
         losses = {'loss_cls': loss_cls.item(),
@@ -282,6 +282,10 @@ class DecTrainer(BaseTrainer):
             proxy_score = 1 - stat.summarize_key('loss')
             writer.add_scalar('all/checkpoint_score', proxy_score, epoch)
             self.checkpoint_best(proxy_score, epoch)
+        if epoch == 0 or epoch == 29:
+            proxy_score = 1 - stat.summarize_key('loss')
+            writer.add_scalar('all/checkpoint_score', proxy_score, epoch)
+            self.checkpoint_best(proxy_score, epoch)
 
     def _visualise(self, epoch, image, masks, mask_logits, cls_out, gt_labels):
         image_norm = self.denorm(image.clone()).cpu()
@@ -332,7 +336,9 @@ if __name__ == '__main__':
             with torch.no_grad():
                 if not DEBUG:
                     time_call(trainer.validation, 'Validation / Train: ', epoch, trainer.writer, trainer.trainloader_val)
-                time_call(trainer.validation, 'Validation /   Val: ', epoch, trainer.writer_val, trainer.valloader, checkpoint=True)
+                time_call(trainer.validation, 'Validation / Val: ', epoch, trainer.writer_val, trainer.valloader, checkpoint = True)
+        if epoch >= 29:
+            time_call(trainer.validation, 'Validation / Val for last epoch: ', epoch, trainer.writer_val, trainer.valloader, checkpoint = True)
 
         time_call(trainer.train_epoch, 'Train epoch: ', epoch)
     print('Done training')

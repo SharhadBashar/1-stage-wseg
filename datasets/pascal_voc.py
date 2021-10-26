@@ -150,7 +150,7 @@ class VOCSegmentation(PascalVOC):
         if self.split != 'test':
             assert (len(self.images) == len(self.masks))
             if self.split == 'train':
-                assert len(self.images) == 10582
+                assert len(self.images) >= 10582
             elif self.split == 'val':
                 assert len(self.images) == 1449
 

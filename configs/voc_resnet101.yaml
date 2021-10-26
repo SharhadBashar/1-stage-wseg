@@ -5,7 +5,7 @@ DATASET:
   SCALE_TO: 1.0
 TRAIN:
   BATCH_SIZE: 16
-  NUM_EPOCHS: 20
+  NUM_EPOCHS: 30
   NUM_WORKERS: 8
   PRETRAIN: 5
 NET:
@@ -18,7 +18,7 @@ NET:
   WEIGHT_DECAY: 0.0005
 TEST:
   METHOD: "multiscale" # multiscale | crop
-  DATA_ROOT: "/fastdata/naraslanov"
+  DATA_ROOT: "data"
   FLIP: True
   BATCH_SIZE: 8 # 4 scales, +1 flip for each
   PAD_SIZE: [768, 768]

@@ -6,15 +6,18 @@
 CONFIG=configs/voc_resnet38.yaml
 DATASET=pascal_voc
 FILELIST=data/val_voc.txt
+# FILELIST=data/test.txt
 
 ## You values here (see below how they're used)
 #
 OUTPUT_DIR=output
 EXP=baselines
-RUN_ID=v01_size_2
-SNAPSHOT=e018Xs0.850
+# RUN_ID=v01_size_1_1e-1_2
+RUN_ID=test
+SNAPSHOT=e016Xs0.907
 EXTRA_ARGS=
-SAVE_ID=v01_size_2
+# SAVE_ID=v01_size_1_1e-1_2
+SAVE_ID=test
 #
 ##
 
