@@ -43,7 +43,7 @@ class BaseTrainer(object):
 
         self.start_epoch = 0
         self.best_score = -1e16
-        self.checkpoint = Checkpoint(args.snapshot_dir, max_n = 5)
+        self.checkpoint = Checkpoint(args.snapshot_dir)
 
         if not quiet:
             #self.model_id = "%s" % args.run
