@@ -4,7 +4,7 @@ import torch
 
 class Checkpoint(object):
 
-    def __init__(self, path, max_n = 20):
+    def __init__(self, path, max_n = 50):
         self.path = path
         self.max_n = max_n
         self.models = {}
